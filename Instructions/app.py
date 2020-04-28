@@ -48,33 +48,37 @@ def prcp():
         
 @app.route('/api/v1.0/stations')
 def stations():
-    stat=session.query(Station.station).all()
-    return jsonify(stat)
+    results=session.query(Station.station).all()
+    stations = list(np.ravel(results))
+    return jsonify(stations)
 
 @app.route('/api/v1.0/tobs')
 def temps():
+    prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)
     data_12_mo=session.query(Measurement.date, Measurement.prcp).filter(Measurement.date>= prev_year).all()
-    return jsonify(data_12_mo)
+    temps = list(np.ravel(data_12_mo))
+    return jsonify(temps)
 
 
 
 
 
 
-@app.route("/api/v1.0/<start_date>")
-def start_date_agg(start_date):
 
-    canonicalized = start_date.replace(" ", "").lower()
+# @app.route("/api/v1.0/<start_date>")
+# def start_date_agg(start_date):
+
+#     canonicalized = start_date.replace(" ", "").lower()
     
-    start_date_agg= session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs))
-    filter(Measurement.date >= start_date).all()
-    for date in start_date_agg:
-        search_term = start_date_agg["2016-08-01"].replace(" ", "").lower()
+#     start_date_agg= session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs))
+#     filter(Measurement.date >= start_date).all()
+#     for date in start_date_agg:
+#         search_term = start_date_agg["2016-08-01"].replace(" ", "").lower()
 
-        if search_term == canonicalized:
-            return jsonify(start_date_agg)
+#         if search_term == canonicalized:
+#             return jsonify(start_date_agg)
 
-    return jsonify({"error": f"Character with real_name {start_date_agg} not found."}), 404
+#     return jsonify({"error": f"Character with real_name {start_date_agg} not found."}), 404
 
 
 # @app.route("/api/v1.0/justice-league/superhero/<superhero>")
